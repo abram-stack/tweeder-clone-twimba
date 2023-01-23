@@ -1,16 +1,13 @@
 import { tweetsData } from './data.js';
+import { v4 as uuidv4 } from 'https://jspm.dev/uuid';
 
-let tweetInput = document.getElementById('tweet-input');
-const tweetButton = document.getElementById('tweet-btn');
 
 document.addEventListener('click', function (e) {
-  // if there is data-attribute with dataset exist
-  if (e.target.dataset.like)
-        handleLikeClick(e.target.dataset.like);
+  if (e.target.dataset.like) handleLikeClick(e.target.dataset.like);
   else if (e.target.dataset.retweet)
     handleRetweetClick(e.target.dataset.retweet);
-  else if (e.target.dataset.reply) 
-    handleReplyClick(e.target.dataset.reply);
+  else if (e.target.dataset.reply) handleReplyClick(e.target.dataset.reply);
+  else if (e.target.id === 'tweet-btn') handleTweetSubmit();
 });
 
 function handleLikeClick(tweetId) {
@@ -43,21 +40,34 @@ function handleRetweetClick(tweetId) {
   renderTweets();
 }
 
-
 function handleReplyClick(replyId) {
-    const targetedTweetObj = tweetsData.filter(function (tweet) {
-        return tweet.uuid === replyId;
-    })[0];
-    const tweetId = targetedTweetObj.uuid;
+  const targetedTweetObj = tweetsData.filter(function (tweet) {
+    return tweet.uuid === replyId;
+  })[0];
+  const tweetId = targetedTweetObj.uuid;
 
-    document.getElementById(`replies-${tweetId}`).classList.toggle('hidden')
+  document.getElementById(`replies-${tweetId}`).classList.toggle('hidden');
 }
 
-tweetButton.addEventListener('click', function () {
-  console.log(tweetInput.value);
-  tweetInput.value = '';
-  tweetInput = '';
-});
+function handleTweetSubmit() {
+    let tweetInput = document.getElementById('tweet-input');
+
+  if (tweetInput.value) {
+    tweetsData.unshift({
+      handle: `@Scrimba`,
+      profilePic: `images/scrimbalogo.png`,
+      likes: 0,
+      retweets: 0,
+      tweetText: tweetInput.value,
+      replies: [],
+      isLiked: false,
+      isRetweeted: false,
+      uuid: uuidv4(),
+    });
+    tweetInput.value = '';
+    renderTweets();
+  }
+}
 
 function getFeedHtml() {
   let stringHtml = '';
