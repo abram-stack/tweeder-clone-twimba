@@ -1,67 +1,86 @@
-/*
-Challenge:
-1. Put all of the data in its own file called
-   data.js, and export it back into index.js. 
-   Make any changes to index.html that are
-   necessary to make this work.
-2. Log out tweetsData.
-*/
+import { tweetsData } from './data.js';
 
-const tweetsData = [   
-    {
-        handle: `@TrollBot66756542 💎`,
-        profilePic: `images/troll.jpg`,
-        likes: 27,
-        retweets: 10,
-        tweetText: `Buy Bitcoin, ETH Make 💰💰💰 low low prices. 
-            Guaranteed return on investment. HMU DMs open!!`,
-        replies: [],
-        isLiked: false,
-        isRetweeted: false,
-        uuid: '4b161eee-c0f5-4545-9c4b-8562944223ee',
-    },    
-    {
-        handle: `@Elon ✅`,
-        profilePic: `images/musk.png`,
-        likes: 6500,
-        retweets: 234,
-        tweetText: `I need volunteers for a one-way mission to Mars 🪐. No experience necessary🚀`,
-        replies: [
-                  {
-                handle: `@TomCruise ✅`,
-                profilePic: `images/tcruise.png`,
-                tweetText: `Yes! Sign me up! 😎🛩`,
-            },
-                  {
-                handle: `@ChuckNorris ✅`,
-                profilePic: `images/chucknorris.jpeg`,
-                tweetText: `I went last year😴`,
-            },
-        ],
-        isLiked: false,
-        isRetweeted: false,
-        uuid: '3c23454ee-c0f5-9g9g-9c4b-77835tgs2',
-    },
-        {
-        handle: `@NoobCoder12`,
-        profilePic: `images/flower.png`,
-        likes: 10,
-        retweets: 3,
-        tweetText: `Are you a coder if you only know HTML?`,
-        replies: [
-            {
-                handle: `@StackOverflower ☣️`,
-                profilePic: `images/overflow.png`,
-                tweetText: `No. Onviosuly not. Go get a job in McDonald's.`,
-            },
-            {
-                handle: `@YummyCoder64`,
-                profilePic: `images/love.png`,
-                tweetText: `You are wonderful just as you are! ❤️`,
-            },
-        ],
-        isLiked: false,
-        isRetweeted: false,
-        uuid: '8hy671sff-c0f5-4545-9c4b-1237gyys45',
-    },     
-]
+let tweetInput = document.getElementById('tweet-input');
+const tweetButton = document.getElementById('tweet-btn');
+
+
+
+document.addEventListener('click', function (e) {
+    // if there is data-attribute with like exist
+    if (e.target.dataset.like)
+        handleLikeClick(e.target.dataset.like);
+    else if (e.target.dataset.retweet)
+        handleRetweetClick(e.target.dataset.retweet)
+    else if (e.target.dataset.reply)
+            handleReplyClick(e.target.dataset.reply)
+})
+
+
+function handleLikeClick(tweetId) {
+    // it will return as array, to make it return object use index
+    const targetedTweetObj = tweetsData.filter(function (tweet) {
+        return tweet.uuid === tweetId
+    })[0]
+    if (targetedTweetObj.isLiked) {
+        targetedTweetObj.likes--;
+        //targetedTweetObj.isLiked = false
+    }
+    else {
+        targetedTweetObj.likes++
+        //targetedTweetObj.isLiked = true;
+    }
+
+    //other way to flip the boolean
+    targetedTweetObj.isLiked = !targetedTweetObj.isLiked
+    renderTweets()
+}
+
+function handleRetweetClick(tweetId) {
+    console.log('retweet', tweetId);    
+}
+function handleReplyClick(tweetId) {
+    console.log('reply', tweetId)
+}
+
+tweetButton.addEventListener('click', function () {
+  console.log(tweetInput.value);
+  tweetInput.value = '';
+  tweetInput = '';
+});
+
+function getFeedHtml() {
+    let stringHtml = '';
+
+  tweetsData.forEach((tweet) => {
+    stringHtml += `
+            <div class="tweet">
+                <div class="tweet-inner">
+                    <img src="${tweet.profilePic}" class="profile-pic">
+                    <div>
+                        <p class="handle">${tweet.handle}</p>
+                        <p class="tweet-text">${tweet.tweetText}</p>
+                        <div class="tweet-details">
+                            <span class="tweet-detail">
+                                <i class="fa-regular fa-comment-dots" data-reply="${tweet.uuid}"></i>${tweet.replies.length}
+                            </span>
+                            <span class="tweet-detail">
+                                <i class="fa-solid fa-heart" data-like="${tweet.uuid}"></i>${tweet.likes}
+                            </span>
+                            <span class="tweet-detail">
+                                <i class="fa-solid fa-retweet" data-retweet="${tweet.uuid}"></i>${tweet.retweets}
+                            </span>
+                        </div>   
+                    </div>            
+                </div>
+            </div>
+        `;
+  });
+    return stringHtml;
+}
+
+function renderTweets() {
+   document.getElementById('feed').innerHTML = getFeedHtml();
+}
+
+renderTweets();
+
